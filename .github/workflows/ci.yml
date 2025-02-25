@@ -1,24 +1,26 @@
 name: Increment Build Number
 
 on:
-    pull_request:
-      types:
-        - closed
-      branches:
-        - main
-    workflow_dispatch:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
   increment-build:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}
       
       - name: Configure Git
         run: |
@@ -35,10 +37,8 @@ jobs:
           
           # Update build file
           echo $new_build > build
-    
-      - name: Publish changes
-        uses: EndBug/add-and-commit@v9
-        with:
-          message: 'Auto-increment build'
-          default_author: github_actions
-          add: 'build'
+          
+          # Commit and push directly
+          git add build
+          git commit -m "Auto-increment build number to $new_build [skip ci]"
+          git push origin main
