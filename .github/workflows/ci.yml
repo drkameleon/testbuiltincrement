@@ -1,7 +1,7 @@
 name: Increment Build Number
 
 on:
-  pull_request:
+  pull_request_target:
     types:
       - closed
     branches:
@@ -19,6 +19,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
+          ref: main
           fetch-depth: 0
           token: ${{ secrets.PAT_TOKEN }}
       
