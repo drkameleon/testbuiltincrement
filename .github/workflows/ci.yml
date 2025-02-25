@@ -1,0 +1,40 @@
+name: Increment Build Number
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - master
+
+jobs:
+  increment-build:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Configure Git
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+      
+      - name: Increment build number
+        run: |
+          # Read current build number
+          current_build=$(cat build)
+          
+          # Increment build number
+          new_build=$((current_build + 1))
+          
+          # Update build file
+          echo $new_build > build
+          
+          # Commit and push
+          git add build
+          git commit -m "Increment build number to $new_build [skip ci]"
+          git push origin master
